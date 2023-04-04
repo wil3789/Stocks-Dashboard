@@ -24,6 +24,7 @@ index
             <option value="GOOG">Google (GOOGL)</option>
             <option value="AAPL">Apple (AAPL)</option>
             <option value="TSLA">Tesla (TSLA)</option>
+            <option value="SCHW">Schwab (SCHW)</option>
         </select>
         <br>
 
@@ -40,7 +41,6 @@ index
     </div>
 
     <div id="dataviz-container"></div>
-
 
 
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -111,10 +111,10 @@ index
 
 
         // trigger an initial chart update when the page loads:
-        //updateDashboard()
+        updateDashboard()
 
         // trigger a subsequent chart update whenever the button is clicked:
-        //myButton.addEventListener("click", updateDashboard, false)
+        myButton.addEventListener("click", updateDashboard, false)
 
 
 
