@@ -1,2 +1,1 @@
 # Stocks-Dashboard
-Stocks Dashboard

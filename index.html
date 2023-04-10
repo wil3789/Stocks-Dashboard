@@ -28,13 +28,13 @@ index
         </select>
         <br>
 
-        <label>Time Period</label>
+        <label>Time Period:</label>
         <select id="my-time-period">
-            <option value="3 months"> </option>
-            <option value="6 months"> </option>
-            <option value="1 year"> </option>
-            <option value="3 years"> </option>
-            <option value="5 years"> </option>
+            <option value="3 months" selected>3 months</option>
+            <option value="6 months">6 months</option>
+            <option value="1 year">1 year</option>
+            <option value="3 years">3 years</option>
+            <option value="5 years">5 years</option>
         </select>
         <br>
 
@@ -48,6 +48,7 @@ index
     <div>
         <p>Selected Stock: <span id="display-stock-symbol">_____________</span></p>
         <p>Latest (Adjusted) Closing Price: <span id="display-latest-closing-price">__________</span></p>
+        <p>Time Period: <span id="display-time-period">__________</span></p>
     </div>
 
     <div id="dataviz-container"></div>
@@ -59,11 +60,13 @@ index
         // form elements:
         var apiKeyInput = document.getElementById("my-api-key")
         var stockSelector = document.getElementById("my-stock-selector")
+        var timePeriod = document.getElementById("my-time-period")
         var myButton = document.getElementById("my-submit-btn")
 
         // display elements:
         var displaySymbol = document.getElementById("display-stock-symbol")
         var displayLatestClose = document.getElementById("display-latest-closing-price")
+        var displayPeriod=document.getElementById("display-time-period")
 
         // reusable function for chart display:
         function updateDashboard() {
@@ -72,10 +75,11 @@ index
             // capturing form inputs:
             var apiKey = apiKeyInput.value
             var symbol = stockSelector.value
+            var period = timePeriod.value
             console.log("SYMBOL:", symbol)
 
             // compiling request url, given form input values:
-            var requestUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=" + symbol + "&apikey=" + apiKey
+            var requestUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=" + symbol + "&outputsize=full" + "&apikey=" + apiKey
             //console.log("REQUEST URL:", requestUrl)
 
             // issuing an HTTP request for the data:
@@ -89,7 +93,28 @@ index
                 var prices = Object.values(tsd) //> an array of price objects
 
                 var latestDate = dates[0]
-                var earliestDate = dates[dates.length - 1]
+
+                //appx 21 days per trading month. Need to pull appropriate # of dates from JSON file
+                if (period=="3 months"){
+                    var earliestDate = dates[63]
+                }
+                else if (period=="6 months"){
+                    var earliestDate = dates[126]
+                }
+                else if (period=="1 year"){
+                    var earliestDate = dates[252]
+                }
+                else if (period=="3 years"){
+                    var earliestDate = dates[756]
+                }
+                else {
+                    var earliestDate = dates[1260]
+                }
+
+                //create new array for specific date arrange. The graph will reference this array
+                let endIndex = dates.indexOf(earliestDate)
+                var specifiedDates = dates.slice(0,endIndex)
+
                 console.log("DATE RANGE:", earliestDate, "-", latestDate)
 
                 var closingPrices = prices.map(obj => parseFloat(obj["5. adjusted close"])) //> an array of prices, for the chart
@@ -100,12 +125,14 @@ index
                 // updating the contents of the page:
                 displaySymbol.innerText = symbol
                 displayLatestClose.innerText = latestCloseUSD
+                displayPeriod.innerText = earliestDate + " to " + latestDate
 
                 // charting the data (see https://plotly.com/javascript/line-charts/):
                 var title = "Daily Closing Prices for Stock: " + symbol
                 var layout = {title: title, height: 500}
                 var chartData = [
-                    {x: dates, y: closingPrices, mode: "lines+markers"}
+                    //the chart now references the new array created in line 116
+                    {x: specifiedDates, y: closingPrices, mode: "lines+markers"}
                 ]
                 Plotly.newPlot("dataviz-container", chartData, layout, {responsive: true})
 
