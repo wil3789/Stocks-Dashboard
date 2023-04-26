@@ -1,90 +1,86 @@
-index
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>My Stocks Dashboard</title>
 
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+
     <!-- Google tag (gtag.js) goes somewhere around here -->
 </head>
 <body>
 
-    <h1>My Stocks Dashboard</h1>
+   <!--
+      BOOTSTRAP NAV
+      https://getbootstrap.com/docs/5.0/components/navbar/
+  -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light"style="font-size:1.5em;">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/">Stocks Dashboard</a>
 
-    <h2>Inputs</h2>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
 
-    <div>
-        <label>AlphaVantage API Key:</label>
-        <input type="text" name="api-key" id="my-api-key" placeholder="demo" value="demo">
-        <br>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
-        <label>Stock:</label>
-        <select id="my-stock-selector">
-            <option value="MSFT" selected>Microsoft (MSFT)</option>
-            <option value="GOOG">Google (GOOGL)</option>
-            <option value="AAPL">Apple (AAPL)</option>
-            <option value="TSLA">Tesla (TSLA)</option>
-            <option value="SCHW">Schwab (SCHW)</option>
-        </select>
-        <br>
+              <li class="nav-item">
+                <a class="nav-link" href="instructions.html">Instructions</a>
+              </li>
 
-        <label>Time Period:</label>
-        <select id="my-time-period">
-            <option value="3 months" selected>3 months</option>
-            <option value="6 months">6 months</option>
-            <option value="1 year">1 year</option>
-            <option value="3 years">3 years</option>
-            <option value="5 years">5 years</option>
-        </select>
-        <br>
+              <li class="nav-item">
+                <a class="nav-link" href="input_form.html">Input Form</a>
+              </li>
 
-        <button id="my-submit-btn">Go!</button>
-    </div>
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="draft.html">Results</a>
+              </li>
 
-    <hr>
+            </ul>
+          </div>
+        </div>
+    </nav>
 
     <h2>Outputs</h2>
 
     <div>
-        <p>Selected Stock: <span id="display-stock-symbol">_____________</span></p>
+        <p>Selected Stock: <span id="display-tickers">_____________</span></p>
         <p>Latest (Adjusted) Closing Price: <span id="display-latest-closing-price">__________</span></p>
         <p>Time Period: <span id="display-time-period">__________</span></p>
     </div>
 
-    <div id="dataviz-container"></div>
+    <footer style="position: fixed; left: 0; bottom: 1em; width: 100%; ">
+      <hr>
+      &copy; Copyright 2023 Will Boisseau |
+      <a href="https://github.com/wil3789/Stocks-Dashboard">source</a>
+    </footer>
 
+    <div id="dataviz-container"></div>
+    <div id="dataviz-container2"></div>
 
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script type="text/javascript">
 
-        // form elements:
-        var apiKeyInput = document.getElementById("my-api-key")
-        var stockSelector = document.getElementById("my-stock-selector")
-        var timePeriod = document.getElementById("my-time-period")
-        var myButton = document.getElementById("my-submit-btn")
+    var apikey = window.location.search.split("&")[0].split("=")[1];
+    var tickers = window.location.search.split("&")[1].split("=")[1];
+    var benchmark = window.location.search.split("&")[2].split("=")[1];
 
-        // display elements:
-        var displaySymbol = document.getElementById("display-stock-symbol")
-        var displayLatestClose = document.getElementById("display-latest-closing-price")
-        var displayPeriod=document.getElementById("display-time-period")
+    // display elements:
+    var displayTickers = document.getElementById("display-tickers")
+    var displayLatestClose = document.getElementById("display-latest-closing-price")
+    var displayPeriod=document.getElementById("display-time-period")
 
-        // reusable function for chart display:
-        function updateDashboard() {
-            console.log("--------------------")
 
-            // capturing form inputs:
-            var apiKey = apiKeyInput.value
-            var symbol = stockSelector.value
-            var period = timePeriod.value
-            console.log("SYMBOL:", symbol)
+    function updateDashboard()
+    {
+      //can use this as apikey placeholder: ZA7MCBB2Y439DIXR
+      var requestUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=" + tickers + "&outputsize=full" + "&apikey=" + "ZA7MCBB2Y439DIXR"
+      var benchUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=" + benchmark + "&outputsize=full" + "&apikey=" + "ZA7MCBB2Y439DIXR"
 
-            // compiling request url, given form input values:
-            var requestUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=" + symbol + "&outputsize=full" + "&apikey=" + apiKey
-            var benchUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=VOO" + "&outputsize=full" + "&apikey=" + apiKey
-            //console.log("REQUEST URL:", requestUrl)
-
-            // issuing an HTTP request for the data:
-            fetch(requestUrl).then(response => response.json()).then(responseData => {
+       // issuing an HTTP request for the ticker data:
+       fetch(requestUrl).then(response => response.json()).then(responseData => {
                 console.log("DATA", responseData)
 
                 // processing the specific JSON response data returned by the API server:
@@ -94,8 +90,9 @@ index
                 var prices = Object.values(tsd) //> an array of price objects
 
                 var latestDate = dates[0]
+                var earliestDate = dates[dates.length - 1]
 
-                //appx 21 days per trading month. Need to pull appropriate # of dates from JSON file
+                /*appx 21 days per trading month. Need to pull appropriate # of dates from JSON file
                 if (period=="3 months"){
                     var earliestDate = dates[63]
                 }
@@ -112,9 +109,11 @@ index
                     var earliestDate = dates[1260]
                 }
 
-                //create new array for specific date arrange. The graph will reference this array
-                let endIndex = dates.indexOf(earliestDate)
-                var specifiedDates = dates.slice(0,endIndex)
+
+                create new array for specific date arrange. This will be used in the final project
+                  let endIndex = dates.indexOf(earliestDate)
+                  var specifiedDates = dates.slice(0,endIndex)
+                */
 
                 console.log("DATE RANGE:", earliestDate, "-", latestDate)
 
@@ -124,16 +123,17 @@ index
                 console.log("LATEST CLOSE:", latestCloseUSD)
 
                 // updating the contents of the page:
-                displaySymbol.innerText = symbol
+                displayTickers.innerText = tickers
                 displayLatestClose.innerText = latestCloseUSD
-                displayPeriod.innerText = earliestDate + " to " + latestDate
+                //displayPeriod.innerText = earliestDate + " to " + latestDate
 
                 // charting the data (see https://plotly.com/javascript/line-charts/):
-                var title = "Daily Closing Prices for Stock: " + symbol
-                var layout = {title: title, height: 500}
+                var title = "Daily Closing Prices for Stock: " + tickers
+                var layout = {title: title, height: 400}
                 var chartData = [
                     //the chart now references the new array created in line 116
-                    {x: specifiedDates, y: closingPrices, mode: "lines+markers"}
+                    //{x: specifiedDates, y: closingPrices, mode: "lines+markers"}
+                    {x: dates, y: closingPrices, mode: "lines+markers"}
                 ]
                 Plotly.newPlot("dataviz-container", chartData, layout, {responsive: true})
 
@@ -142,8 +142,11 @@ index
                 console.error("OOPS", err)
                 alert("OOPS, please check your inputs and try again.")
             })
-            // issuing an HTTP request for the BENCHMARK data:
-            fetch (benchUrl).then(response => response.json()).then(responseData => {
+
+            //issuing HTTP request for the benchmark data
+            fetch(benchUrl).then(response => response.json()).then(responseData => {
+                console.log("DATA", responseData)
+
                 // processing the specific JSON response data returned by the API server:
                 var tsd = responseData["Time Series (Daily)"]
 
@@ -151,8 +154,9 @@ index
                 var prices = Object.values(tsd) //> an array of price objects
 
                 var latestDate = dates[0]
+                var earliestDate = dates[dates.length - 1]
 
-                //appx 21 days per trading month. Need to pull appropriate # of dates from JSON file
+                /*appx 21 days per trading month. Need to pull appropriate # of dates from JSON file
                 if (period=="3 months"){
                     var earliestDate = dates[63]
                 }
@@ -169,9 +173,11 @@ index
                     var earliestDate = dates[1260]
                 }
 
-                //create new array for specific date arrange. The graph will reference this array
-                let endIndex = dates.indexOf(earliestDate)
-                var specifiedDates = dates.slice(0,endIndex)
+
+                create new array for specific date arrange. This will be used in the final project
+                  let endIndex = dates.indexOf(earliestDate)
+                  var specifiedDates = dates.slice(0,endIndex)
+                */
 
                 console.log("DATE RANGE:", earliestDate, "-", latestDate)
 
@@ -181,35 +187,32 @@ index
                 console.log("LATEST CLOSE:", latestCloseUSD)
 
                 // updating the contents of the page:
-                displaySymbol.innerText = "VOO (S&P ETF)"
+                displayTickers.innerText = tickers
                 displayLatestClose.innerText = latestCloseUSD
-                displayPeriod.innerText = earliestDate + " to " + latestDate
+                //displayPeriod.innerText = earliestDate + " to " + latestDate
 
                 // charting the data (see https://plotly.com/javascript/line-charts/):
-                var title = "Daily Closing Prices for Benchmark: VOO"
-                var layout = {title: title, height: 500}
+                var title = "Daily Closing Prices for Stock: " + benchmark
+                var layout = {title: title, height: 400}
                 var chartData = [
                     //the chart now references the new array created in line 116
-                    {x: specifiedDates, y: closingPrices, mode: "lines+markers"}
+                    //{x: specifiedDates, y: closingPrices, mode: "lines+markers"}
+                    {x: dates, y: closingPrices, mode: "lines+markers"}
                 ]
-                Plotly.newPlot("dataviz-container", chartData, layout, {responsive: true})
+                Plotly.newPlot("dataviz-container2", chartData, layout, {responsive: true})
 
+            // this will get triggered if there was an error in the request or charting process:
+            }).catch(function(err){
+                console.error("OOPS", err)
+                alert("OOPS, please check your inputs and try again.")
             })
-            
 
-            // send event to GA (requires gtag setup in <head> section):
-            //gtag("event", "chart_update", {"symbol": symbol})
-        }
+    }
 
-
-        // trigger an initial chart update when the page loads:
-        updateDashboard()
-
-        // trigger a subsequent chart update whenever the button is clicked:
-        myButton.addEventListener("click", updateDashboard, false)
-
+    updateDashboard()
 
 
     </script>
+
 </body>
 </html>
