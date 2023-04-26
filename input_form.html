@@ -28,7 +28,7 @@
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
                 <li class="nav-item">
-                    <a class="nav-link" href="instructions.html">Instructions</a>
+                    <a class="nav-link" href="index.html">Instructions</a>
                   </li>
 
                 <li class="nav-item">
@@ -36,7 +36,7 @@
                   </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="draft.html">Results</a>
+                    <a class="nav-link" aria-current="page" href="results.html">Results</a>
                   </li>
             </ul>
           </div>
@@ -47,7 +47,6 @@
         BOOTSTRAP FORM
         https://getbootstrap.com/docs/5.0/forms/overview/
       -->
-
       <form class="mx-auto" style="max-width: 500px; margin-top:2em;">
         <h3>What Data are you Interested In?</h3>
 
@@ -58,10 +57,9 @@
 
         <div class="mb-3">
           <label for="tickers" class="form-label">Stock tickers</label>
-          <input type="text" class="form-control" id="my-tickers" aria-describedby="tickerHelp" placeholder="GOOG,AAPL,NFLX" autocomplete="off">
-          <div id="tickerHelp" class="form-text">Enter up to 4 tickers, separated by a comma.</div>
+          <input type="text" class="form-control" id="my-tickers" aria-describedby="tickerHelp" placeholder="GOOG" autocomplete="off">
+          <div id="tickerHelp" class="form-text">Enter a ticker</div>
         </div>
-
 
         <!--store the requested tickers here. To be used for final project:
           <ul id='ticker list'></ul>
@@ -99,12 +97,15 @@
 
 
     <script>
-        // JS Code to read inputs from Input Form to Results page
 
-
-        var periodInput = document.getElementById("my-time-period")
+        // display elements:
+        var displaySymbol = document.getElementById("display-stock-symbol")
+        var displayLatestClose = document.getElementById("display-latest-closing-price")
+        var displayPeriod=document.getElementById("display-time-period")
+        var displayDate = document.getElementById("my-date")
+        var checkbox = document.getElementById ("show-bench")
         var submitButton = document.getElementById("my-button")
-        // etc...
+
 
         function handleSubmit(event) {
           event.preventDefault() // because our button happens to be in a form, we prevent the default form action that would be triggered when the form is submitted
@@ -113,12 +114,17 @@
               //tickers=tickerInput.value
               //tickerlist=tickers.split(/[ ,]+/)
 
-              var apikeyInput = document.getElementById("my-api-key").value;
-              var tickerInput = document.getElementById("my-tickers").value;
-              var benchmarkInput = document.getElementById("my-benchmark").value;
+              var apikeyInput = document.getElementById("my-api-key").value
+              var tickerInput = document.getElementById("my-tickers").value
+              var benchmarkInput = document.getElementById("my-benchmark").value
+              var dateInput = document.getElementById("my-date").value
 
-              //TODO: replace url with index.html once site is hosted
-              window.location.href="file:///C:/Users/Will_Boisseau/Stocks-Dashboard/draft.html?input1="+apikeyInput+"&input2="+tickerInput+"&input3="+benchmarkInput;
+              if (checkbox.checked){
+                window.location.href="https://github.com/wil3789/Stocks-Dashboard/index.html?input1="+apikeyInput+"&input2="+tickerInput+"&input3="+dateInput+"&input4="+benchmarkInput;
+               }
+                else{
+                  window.location.href="https://github.com/wil3789/Stocks-Dashboard/index.html?input1="+apikeyInput+"&input2="+tickerInput+"&input3="+dateInput;
+                  }
 
           console.log("---------------------")
           console.log("FORM SUBMIT...")
@@ -126,5 +132,6 @@
         }
 
         submitButton.addEventListener("click", handleSubmit)
+
     </script>
 </body>

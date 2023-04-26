@@ -27,7 +27,7 @@
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
               <li class="nav-item">
-                <a class="nav-link" href="instructions.html">Instructions</a>
+                <a class="nav-link" href="index.html">Instructions</a>
               </li>
 
               <li class="nav-item">
@@ -35,7 +35,7 @@
               </li>
 
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="draft.html">Results</a>
+                <a class="nav-link active" aria-current="page" href="results.html">Results</a>
               </li>
 
             </ul>
@@ -63,9 +63,9 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script type="text/javascript">
 
-    var apikey = window.location.search.split("&")[0].split("=")[1];
-    var tickers = window.location.search.split("&")[1].split("=")[1];
-    var benchmark = window.location.search.split("&")[2].split("=")[1];
+    var apikey = window.location.search.split("&")[0].split("=")[1]
+    var tickers = window.location.search.split("&")[1].split("=")[1]
+    //var startDate= window.location.search.split("&")[2].split("=")[1]
 
     // display elements:
     var displayTickers = document.getElementById("display-tickers")
@@ -77,7 +77,6 @@
     {
       //can use this as apikey placeholder: ZA7MCBB2Y439DIXR
       var requestUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=" + tickers + "&outputsize=full" + "&apikey=" + "ZA7MCBB2Y439DIXR"
-      var benchUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=" + benchmark + "&outputsize=full" + "&apikey=" + "ZA7MCBB2Y439DIXR"
 
        // issuing an HTTP request for the ticker data:
        fetch(requestUrl).then(response => response.json()).then(responseData => {
@@ -89,33 +88,19 @@
                 var dates = Object.keys(tsd) //> an array of date keys, for the chart ["2020-01-27", "2020-01-24", "2020-01-23", etc.]
                 var prices = Object.values(tsd) //> an array of price objects
 
+                /*var selected_tsd = Object.entries(tsd).filter(function(entries)
+                {
+                  return (entries[0] > startDate)
+                })*/
+
+                //var dates = Object.values(selected_tsd) //> an array of date keys, for the chart ["2020-01-27", "2020-01-24", "2020-01-23", etc.]
+                //var prices = Object.values(selected_tsd) //> an array of price objects
+
+
                 var latestDate = dates[0]
                 var earliestDate = dates[dates.length - 1]
 
-                /*appx 21 days per trading month. Need to pull appropriate # of dates from JSON file
-                if (period=="3 months"){
-                    var earliestDate = dates[63]
-                }
-                else if (period=="6 months"){
-                    var earliestDate = dates[126]
-                }
-                else if (period=="1 year"){
-                    var earliestDate = dates[252]
-                }
-                else if (period=="3 years"){
-                    var earliestDate = dates[756]
-                }
-                else {
-                    var earliestDate = dates[1260]
-                }
-
-
-                create new array for specific date arrange. This will be used in the final project
-                  let endIndex = dates.indexOf(earliestDate)
-                  var specifiedDates = dates.slice(0,endIndex)
-                */
-
-                console.log("DATE RANGE:", earliestDate, "-", latestDate)
+                //console.log("DATE RANGE:", earliestDate, "-", latestDate)
 
                 var closingPrices = prices.map(obj => parseFloat(obj["5. adjusted close"])) //> an array of prices, for the chart
                 var latestClose = closingPrices[0]
@@ -143,6 +128,9 @@
                 alert("OOPS, please check your inputs and try again.")
             })
 
+          var benchmark = window.location.search.split("&")[3].split("=")[1]
+          var benchUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=" + benchmark + "&outputsize=full" + "&apikey=" + "ZA7MCBB2Y439DIXR"
+
             //issuing HTTP request for the benchmark data
             fetch(benchUrl).then(response => response.json()).then(responseData => {
                 console.log("DATA", responseData)
@@ -155,29 +143,6 @@
 
                 var latestDate = dates[0]
                 var earliestDate = dates[dates.length - 1]
-
-                /*appx 21 days per trading month. Need to pull appropriate # of dates from JSON file
-                if (period=="3 months"){
-                    var earliestDate = dates[63]
-                }
-                else if (period=="6 months"){
-                    var earliestDate = dates[126]
-                }
-                else if (period=="1 year"){
-                    var earliestDate = dates[252]
-                }
-                else if (period=="3 years"){
-                    var earliestDate = dates[756]
-                }
-                else {
-                    var earliestDate = dates[1260]
-                }
-
-
-                create new array for specific date arrange. This will be used in the final project
-                  let endIndex = dates.indexOf(earliestDate)
-                  var specifiedDates = dates.slice(0,endIndex)
-                */
 
                 console.log("DATE RANGE:", earliestDate, "-", latestDate)
 
@@ -202,17 +167,11 @@
                 Plotly.newPlot("dataviz-container2", chartData, layout, {responsive: true})
 
             // this will get triggered if there was an error in the request or charting process:
-            }).catch(function(err){
-                console.error("OOPS", err)
-                alert("OOPS, please check your inputs and try again.")
             })
 
     }
-
     updateDashboard()
 
-
     </script>
-
 </body>
 </html>
