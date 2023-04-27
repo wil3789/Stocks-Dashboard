@@ -91,8 +91,8 @@
 
     function updateDashboard()
     {
-      //can use this as apikey placeholder: ZA7MCBB2Y439DIXR
-      var requestUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=" + tickers + "&outputsize=full" + "&apikey=" + "ZA7MCBB2Y439DIXR"
+      //get alpha vantage url
+      var requestUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=" + tickers + "&outputsize=full" + "&apikey=" + apikey
 
        // issuing an HTTP request for the ticker data:
        fetch(requestUrl).then(response => response.json()).then(responseData => {
@@ -148,7 +148,6 @@
 
      function showBench ()
      {
-
           var benchUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=" + benchmark + "&outputsize=full" + "&apikey=" + "ZA7MCBB2Y439DIXR"
 
             //issuing HTTP request for the benchmark data
